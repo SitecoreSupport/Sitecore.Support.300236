@@ -50,6 +50,14 @@
       <HintPath>..\packages\SC.Microsoft.Extensions.Configuration.Abstractions.9.0.1\lib\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\SC.Microsoft.Extensions.DependencyInjection.9.0.1\lib\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\SC.Microsoft.Extensions.DependencyInjection.Abstractions.9.0.1\lib\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Microsoft.Extensions.Logging, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\SC.Microsoft.Extensions.Logging.9.0.1\lib\Microsoft.Extensions.Logging.dll</HintPath>
       <Private>False</Private>
@@ -78,8 +86,24 @@
       <HintPath>..\packages\SC.Sitecore.XConnect.Client.9.0.1\lib\Sitecore.XConnect.Client.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Sitecore.XConnect.Client.Configuration, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SC.Sitecore.XConnect.Client.Configuration.9.0.1\lib\Sitecore.XConnect.Client.Configuration.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Sitecore.XConnect.Collection.Model, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SC.Sitecore.XConnect.Collection.Model.9.0.1\lib\Sitecore.XConnect.Collection.Model.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Sitecore.XConnect.DependencyInjection, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SC.Sitecore.XConnect.DependencyInjection.9.0.1\lib\Sitecore.XConnect.DependencyInjection.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Sitecore.XConnect.DependencyInjection.Web, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SC.Sitecore.XConnect.DependencyInjection.Web.9.0.1\lib\Sitecore.XConnect.DependencyInjection.Web.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Sitecore.XConnect.Web, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SC.Sitecore.XConnect.Web.9.0.1\lib\Sitecore.XConnect.Web.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Sitecore.Xdb.Common.Web, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -94,6 +118,10 @@
       <HintPath>..\packages\SC.Sitecore.Xdb.MarketingAutomation.OperationsClient.9.0.1\lib\Sitecore.Xdb.MarketingAutomation.OperationsClient.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Sitecore.Xdb.MarketingAutomation.Web, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SC.Sitecore.Xdb.MarketingAutomation.Web.9.0.1\lib\Sitecore.Xdb.MarketingAutomation.Web.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
@@ -102,10 +130,18 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\SC.System.Web.Http.9.0.1\lib\System.Web.Http.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Xdb\MarketingAutomation\Web\XConnect\XConnectHttpConfigurationOperations.cs" />
+    <Compile Include="UseXdbModelValidatorAttribute.cs" />
+    <Compile Include="Xdb\MarketingAutomation\Web\XdbModelValidator.cs" />
+    <Compile Include="Xdb\MarketingAutomation\Web\SupportMarketingAutomationLiveEventController.cs" />
     <Compile Include="Xdb\MarketingAutomation\OperationsClient\AutomationOperationsClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
