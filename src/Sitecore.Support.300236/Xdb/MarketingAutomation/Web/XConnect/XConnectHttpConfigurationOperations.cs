@@ -30,7 +30,7 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.Web.XConnect
       });
       config.Routes.MapHttpRoute("MarketingAutomationLiveEvent", "marketing-automation/liveevent/{action}", new
       {
-        controller = "MarketingAutomationLiveEvent",
+        controller = "SupportMarketingAutomationLiveEvent",
         action = "Index"
       });
       config.Routes.MapHttpRoute("MarketingAutomationEnrollment", "marketing-automation/enrollment/{action}", new
@@ -48,7 +48,6 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.Web.XConnect
       }
       JsonSerializerSettings expr_C7 = config.Formatters.JsonFormatter.SerializerSettings;
       expr_C7.Converters.Add(new CustomValuesDictionaryJsonConverter());
-      expr_C7.Converters.Add(new LiveEventDataJsonConverter(CollectionModel.Model));
       DefaultContractResolver defaultContractResolver = expr_C7.ContractResolver as DefaultContractResolver;
       if (defaultContractResolver != null)
       {

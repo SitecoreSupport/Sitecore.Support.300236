@@ -17,7 +17,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Sitecore.Configuration;
 using Sitecore.Framework.Conditions;
+using Sitecore.XConnect.Client.Configuration;
 using Sitecore.XConnect.Client.Serialization;
 using Sitecore.XConnect.Collection.Model;
 using Sitecore.Xdb.Common.Web;
@@ -34,6 +36,8 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.OperationsClient
   /// </summary>
   public class AutomationOperationsClient : CommonWebApiClient<OperationRoutes>, IAutomationOperationsClient
   {
+    private readonly IModelConfiguration _modelConfiguration;
+
     /// <summary>
     /// The name of the connection string holding the URL for the endpoint to communicate with.
     /// </summary>
@@ -43,8 +47,8 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.OperationsClient
     /// Initializes a new instance of the <see cref="T:Sitecore.Xdb.MarketingAutomation.OperationsClient.AutomationOperationsClient" /> class.
     /// </summary>
     /// <param name="logger">The logger to log messages to.</param>
-    public AutomationOperationsClient(ILogger<AutomationOperationsClient> logger)
-      : this(AutomationOperationsClient.ServiceAddressFromConnectionString, (IEnumerable<IHttpClientModifier>)null, (IEnumerable<IWebRequestHandlerModifier>)null, logger)
+    public AutomationOperationsClient(ILogger<Sitecore.Xdb.MarketingAutomation.OperationsClient.AutomationOperationsClient> logger)
+      : this(AutomationOperationsClient.ServiceAddressFromConnectionString, (IEnumerable<IHttpClientModifier>)null, (IEnumerable<IWebRequestHandlerModifier>)null, logger, null)
     {
     }
 
@@ -53,11 +57,12 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.OperationsClient
     /// </summary>
     /// <param name="logger">The logger to log messages to.</param>
     /// <param name="configuration">The configuration to load from.</param>
-    public AutomationOperationsClient(ILogger<AutomationOperationsClient> logger, IConfiguration configuration)
+    public AutomationOperationsClient(ILogger<Sitecore.Xdb.MarketingAutomation.OperationsClient.AutomationOperationsClient> logger, IConfiguration configuration)
       : base(new OperationRoutes(AutomationOperationsClient.ServiceAddressFromConnectionString), Condition.Requires<IConfiguration>(configuration, nameof(configuration)).IsNotNull<IConfiguration>().Value)
     {
-      Condition.Requires<ILogger<AutomationOperationsClient>>(logger, nameof(logger)).IsNotNull<ILogger<AutomationOperationsClient>>();
+      Condition.Requires(logger, nameof(logger)).IsNotNull();
       this.Logger = logger;
+      _modelConfiguration = Factory.CreateObject("xconnect/runtime", true) as IModelConfiguration;
     }
 
     /// <summary>
@@ -65,8 +70,8 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.OperationsClient
     /// </summary>
     /// <param name="serviceBaseAddress">The address of the controller hosting the service.</param>
     /// <param name="logger">The logger to log messages to.</param>
-    public AutomationOperationsClient(Uri serviceBaseAddress, ILogger<AutomationOperationsClient> logger)
-      : this(serviceBaseAddress, (IEnumerable<IHttpClientModifier>)null, (IEnumerable<IWebRequestHandlerModifier>)null, logger)
+    public AutomationOperationsClient(Uri serviceBaseAddress, ILogger<Sitecore.Xdb.MarketingAutomation.OperationsClient.AutomationOperationsClient> logger)
+      : this(serviceBaseAddress, (IEnumerable<IHttpClientModifier>)null, (IEnumerable<IWebRequestHandlerModifier>)null, logger, null)
     {
     }
 
@@ -75,8 +80,8 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.OperationsClient
     /// </summary>
     /// <param name="clientModifiers">An ordered list of classes which modify the <see cref="T:System.Net.Http.HttpClient" /> after creation.</param>
     /// <param name="logger">The logger to log messages to.</param>
-    public AutomationOperationsClient(IEnumerable<IHttpClientModifier> clientModifiers, ILogger<AutomationOperationsClient> logger)
-      : this(AutomationOperationsClient.ServiceAddressFromConnectionString, clientModifiers, (IEnumerable<IWebRequestHandlerModifier>)null, logger)
+    public AutomationOperationsClient(IEnumerable<IHttpClientModifier> clientModifiers, ILogger<Sitecore.Xdb.MarketingAutomation.OperationsClient.AutomationOperationsClient> logger)
+      : this(AutomationOperationsClient.ServiceAddressFromConnectionString, clientModifiers, (IEnumerable<IWebRequestHandlerModifier>)null, logger, null)
     {
     }
 
@@ -86,8 +91,8 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.OperationsClient
     /// <param name="serviceBaseAddress">The address of the controller hosting the service.</param>
     /// <param name="clientModifiers">An ordered list of classes which modify the <see cref="T:System.Net.Http.HttpClient" /> after creation.</param>
     /// <param name="logger">The logger to log messages to.</param>
-    public AutomationOperationsClient(Uri serviceBaseAddress, IEnumerable<IHttpClientModifier> clientModifiers, ILogger<AutomationOperationsClient> logger)
-      : this(serviceBaseAddress, clientModifiers, (IEnumerable<IWebRequestHandlerModifier>)null, logger)
+    public AutomationOperationsClient(Uri serviceBaseAddress, IEnumerable<IHttpClientModifier> clientModifiers, ILogger<Sitecore.Xdb.MarketingAutomation.OperationsClient.AutomationOperationsClient> logger)
+      : this(serviceBaseAddress, clientModifiers, (IEnumerable<IWebRequestHandlerModifier>)null, logger, null)
     {
     }
 
@@ -96,8 +101,8 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.OperationsClient
     /// </summary>
     /// <param name="webRequestHandlerModifiers">An ordered list of classes which modify the <see cref="T:System.Net.Http.WebRequestHandler" /> after creation.</param>
     /// <param name="logger">The logger to log messages to.</param>
-    public AutomationOperationsClient(IEnumerable<IWebRequestHandlerModifier> webRequestHandlerModifiers, ILogger<AutomationOperationsClient> logger)
-      : this(AutomationOperationsClient.ServiceAddressFromConnectionString, (IEnumerable<IHttpClientModifier>)null, webRequestHandlerModifiers, logger)
+    public AutomationOperationsClient(IEnumerable<IWebRequestHandlerModifier> webRequestHandlerModifiers, ILogger<Sitecore.Xdb.MarketingAutomation.OperationsClient.AutomationOperationsClient> logger)
+      : this(AutomationOperationsClient.ServiceAddressFromConnectionString, (IEnumerable<IHttpClientModifier>)null, webRequestHandlerModifiers, logger, null)
     {
     }
 
@@ -107,8 +112,8 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.OperationsClient
     /// <param name="serviceBaseAddress">The address of the controller hosting the service.</param>
     /// <param name="webRequestHandlerModifiers">An ordered list of classes which modify the <see cref="T:System.Net.Http.WebRequestHandler" /> after creation.</param>
     /// <param name="logger">The logger to log messages to.</param>
-    public AutomationOperationsClient(Uri serviceBaseAddress, IEnumerable<IWebRequestHandlerModifier> webRequestHandlerModifiers, ILogger<AutomationOperationsClient> logger)
-      : this(serviceBaseAddress, (IEnumerable<IHttpClientModifier>)null, webRequestHandlerModifiers, logger)
+    public AutomationOperationsClient(Uri serviceBaseAddress, IEnumerable<IWebRequestHandlerModifier> webRequestHandlerModifiers, ILogger<Sitecore.Xdb.MarketingAutomation.OperationsClient.AutomationOperationsClient> logger)
+      : this(serviceBaseAddress, (IEnumerable<IHttpClientModifier>)null, webRequestHandlerModifiers, logger, null)
     {
     }
 
@@ -118,8 +123,9 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.OperationsClient
     /// <param name="clientModifiers">An ordered list of classes which modify the <see cref="T:System.Net.Http.HttpClient" /> after creation.</param>
     /// <param name="webRequestHandlerModifiers">An ordered list of classes which modify the <see cref="T:System.Net.Http.WebRequestHandler" /> after creation.</param>
     /// <param name="logger">The logger to log messages to.</param>
-    public AutomationOperationsClient(IEnumerable<IHttpClientModifier> clientModifiers, IEnumerable<IWebRequestHandlerModifier> webRequestHandlerModifiers, ILogger<AutomationOperationsClient> logger)
-      : this(AutomationOperationsClient.ServiceAddressFromConnectionString, clientModifiers, webRequestHandlerModifiers, logger)
+    /// <param name="modelConfiguration">Model Configuration instance.</param>
+    public AutomationOperationsClient(IEnumerable<IHttpClientModifier> clientModifiers, IEnumerable<IWebRequestHandlerModifier> webRequestHandlerModifiers, ILogger<Sitecore.Xdb.MarketingAutomation.OperationsClient.AutomationOperationsClient> logger, IModelConfiguration modelConfiguration)
+      : this(AutomationOperationsClient.ServiceAddressFromConnectionString, clientModifiers, webRequestHandlerModifiers, logger, modelConfiguration)
     {
     }
 
@@ -130,31 +136,35 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.OperationsClient
     /// <param name="clientModifiers">An ordered list of classes which modify the <see cref="T:System.Net.Http.HttpClient" /> after creation.</param>
     /// <param name="webRequestHandlerModifiers">An ordered list of classes which modify the <see cref="T:System.Net.Http.WebRequestHandler" /> after creation.</param>
     /// <param name="logger">The logger to log messages to.</param>
+    /// <param name="modelConfiguration">Model Configuration instance.</param>
     [SuppressMessage("Data Flow", "SC1062:ValidateArgumentsOfPublicMethods", Justification = "clientModifiers can be null", MessageId = "1#")]
-    public AutomationOperationsClient(Uri serviceBaseAddress, IEnumerable<IHttpClientModifier> clientModifiers, IEnumerable<IWebRequestHandlerModifier> webRequestHandlerModifiers, ILogger<AutomationOperationsClient> logger)
+    public AutomationOperationsClient(Uri serviceBaseAddress, IEnumerable<IHttpClientModifier> clientModifiers, IEnumerable<IWebRequestHandlerModifier> webRequestHandlerModifiers, ILogger<Sitecore.Xdb.MarketingAutomation.OperationsClient.AutomationOperationsClient> logger, IModelConfiguration modelConfiguration)
       : base(new OperationRoutes(serviceBaseAddress), clientModifiers, webRequestHandlerModifiers)
     {
-      Condition.Requires<ILogger<AutomationOperationsClient>>(logger, nameof(logger)).IsNotNull<ILogger<AutomationOperationsClient>>();
+      Condition.Requires(logger, nameof(logger)).IsNotNull();
+
       this.Logger = logger;
+      _modelConfiguration = modelConfiguration;
     }
 
     /// <summary>
     /// The <see cref="T:Microsoft.Extensions.Logging.ILogger`1" /> to log messages to.
     /// </summary>
-    protected ILogger<AutomationOperationsClient> Logger { get; set; }
+    protected ILogger<Sitecore.Xdb.MarketingAutomation.OperationsClient.AutomationOperationsClient> Logger { get; set; }
 
     /// <summary>Gets the settings to use during (de)serialization.</summary>
-    protected static JsonSerializerSettings SerializerSettings
+    protected JsonSerializerSettings SerializerSettings
     {
       get
       {
+        var model = _modelConfiguration?.Model ?? CollectionModel.Model;
         return new JsonSerializerSettings()
         {
-          ContractResolver = (IContractResolver)new XdbJsonContractResolver(CollectionModel.Model, true, true),
+          ContractResolver = (IContractResolver)new XdbJsonContractResolver(model, true, true),
           TypeNameHandling = TypeNameHandling.Auto,
           Converters = (IList<JsonConverter>)new List<JsonConverter>()
           {
-            (JsonConverter) new LiveEventDataJsonConverter(CollectionModel.Model)
+            (JsonConverter) new LiveEventDataJsonConverter(model)
           }
         };
       }
@@ -279,7 +289,7 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.OperationsClient
     /// <returns>The content to be sent.</returns>
     protected override HttpContent CreateRequestContent<T>(T content)
     {
-      return (HttpContent)new StringContent(JsonConvert.SerializeObject((object)content, AutomationOperationsClient.SerializerSettings), Encoding.UTF8, JsonMediaTypeFormatter.DefaultMediaType.MediaType);
+      return (HttpContent)new StringContent(JsonConvert.SerializeObject((object)content, SerializerSettings), Encoding.UTF8, JsonMediaTypeFormatter.DefaultMediaType.MediaType);
     }
 
     /// <summary>Create the object from the response.</summary>
@@ -288,7 +298,7 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.OperationsClient
     /// <returns>The object from the response.</returns>
     protected override async Task<T> CreateResponseContentAsync<T>(HttpContent httpContent)
     {
-      return JsonConvert.DeserializeObject<T>(await httpContent.ReadAsStringAsync().ConfigureAwait(false), AutomationOperationsClient.SerializerSettings);
+      return JsonConvert.DeserializeObject<T>(await httpContent.ReadAsStringAsync().ConfigureAwait(false), SerializerSettings);
     }
 
     /// <summary>

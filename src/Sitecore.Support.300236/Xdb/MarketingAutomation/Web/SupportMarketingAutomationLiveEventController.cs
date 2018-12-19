@@ -36,8 +36,10 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.Web
   /// </summary>
   /// <seealso cref="T:System.Web.Http.ApiController" />
   [UseXdbModelValidator]
-  public class MarketingAutomationLiveEventController : ApiController
+  public class SupportMarketingAutomationLiveEventController : ApiController
   {
+    private readonly XdbModel _model;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="T:Sitecore.Xdb.MarketingAutomation.Web.MarketingAutomationLiveEventController" /> class.
     /// </summary>
@@ -45,16 +47,17 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.Web
     /// <param name="processorRunner">The processor runner to run the live event with.</param>
     /// <param name="automationPool">The automation pool to execute operations against.</param>
     /// <param name="logger">The logger to write messages to.</param>
-    public MarketingAutomationLiveEventController(IServiceScopeFactory serviceScopeFactory, IProcessorRunner processorRunner, IAutomationPool automationPool, ILogger<MarketingAutomationLiveEventController> logger)
+    public SupportMarketingAutomationLiveEventController(IServiceScopeFactory serviceScopeFactory, IProcessorRunner processorRunner, IAutomationPool automationPool, ILogger<SupportMarketingAutomationLiveEventController> logger, XdbEdmModel model)
     {
       Condition.Requires<IServiceScopeFactory>(serviceScopeFactory, nameof(serviceScopeFactory)).IsNotNull<IServiceScopeFactory>();
       Condition.Requires<IProcessorRunner>(processorRunner, nameof(processorRunner)).IsNotNull<IProcessorRunner>();
       Condition.Requires<IAutomationPool>(automationPool, nameof(automationPool)).IsNotNull<IAutomationPool>();
-      Condition.Requires<ILogger<MarketingAutomationLiveEventController>>(logger, nameof(logger)).IsNotNull<ILogger<MarketingAutomationLiveEventController>>();
+      Condition.Requires<ILogger<SupportMarketingAutomationLiveEventController>>(logger, nameof(logger)).IsNotNull<ILogger<SupportMarketingAutomationLiveEventController>>();
       this.ServiceScopeFactory = serviceScopeFactory;
       this.ProcessorRunner = processorRunner;
       this.Pool = automationPool;
       this.Logger = logger;
+      _model = model?.Model ?? CollectionModel.Model;
     }
 
     /// <summary>
@@ -64,15 +67,16 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.Web
     /// <param name="processorRunner">The processor runner to run the live event with.</param>
     /// <param name="logger">The logger to write messages to.</param>
     [Obsolete("Deprecated in Sitecore 9.0.1. Use ctor(IServiceScopeFactory, IProcessorRunner, ILogger<MarketingAutomationLiveEventController>) instead.", false)]
-    public MarketingAutomationLiveEventController(IProcessorFactory processorFactory, IProcessorRunner processorRunner, ILogger<MarketingAutomationLiveEventController> logger)
+    public SupportMarketingAutomationLiveEventController(IProcessorFactory processorFactory, IProcessorRunner processorRunner, ILogger<SupportMarketingAutomationLiveEventController> logger, XdbEdmModel model)
     {
       Condition.Requires<IProcessorFactory>(processorFactory, nameof(processorFactory)).IsNotNull<IProcessorFactory>();
       Condition.Requires<IProcessorRunner>(processorRunner, nameof(processorRunner)).IsNotNull<IProcessorRunner>();
-      Condition.Requires<ILogger<MarketingAutomationLiveEventController>>(logger, nameof(logger)).IsNotNull<ILogger<MarketingAutomationLiveEventController>>();
-      logger.LogWarning(Resources.ObsoleteConstructorIsCalled, (object)nameof(MarketingAutomationLiveEventController));
+      Condition.Requires<ILogger<SupportMarketingAutomationLiveEventController>>(logger, nameof(logger)).IsNotNull<ILogger<SupportMarketingAutomationLiveEventController>>();
+      logger.LogWarning("Obsolete constructor of {0} is called", (object)nameof(SupportMarketingAutomationLiveEventController));
       this.ProcessorFactory = processorFactory;
       this.ProcessorRunner = processorRunner;
       this.Logger = logger;
+      _model = model?.Model ?? CollectionModel.Model;
     }
 
     /// <summary>
@@ -93,7 +97,7 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.Web
     protected IAutomationPool Pool { get; set; }
 
     /// <summary>The logger to write messages to.</summary>
-    protected ILogger<MarketingAutomationLiveEventController> Logger { get; }
+    protected ILogger<SupportMarketingAutomationLiveEventController> Logger { get; }
 
     /// <summary>Executes a batch of live events.</summary>
     /// <param name="events">The events to process.</param>
@@ -105,16 +109,15 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.Web
     [HttpPut]
     public async Task<IHttpActionResult> Put([FromBody] IEnumerable<LiveEventRequest> events)
     {
-      MarketingAutomationLiveEventController liveEventController1 = this;
-      MarketingAutomationLiveEventController liveEventController = liveEventController1;
+      SupportMarketingAutomationLiveEventController liveEventController1 = this;
+      SupportMarketingAutomationLiveEventController liveEventController = liveEventController1;
       IEnumerable<LiveEventRequest> events1 = events;
       if (!liveEventController1.ModelState.IsValid)
       {
-        liveEventController1.Logger.LogError(Resources.FailedToPutLiveEventsModelStateNotValid, Array.Empty<object>());
+        liveEventController1.Logger.LogError("Failed to put live events. Model state is not valid.", Array.Empty<object>());
         return (IHttpActionResult)liveEventController1.BadRequest(liveEventController1.ModelState);
       }
-      liveEventController1.Configuration.Formatters.JsonFormatter.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
-      liveEventController1.Configuration.Formatters.JsonFormatter.SerializerSettings.Converters.Add((JsonConverter)new LiveEventDataJsonConverter(CollectionModel.Model));
+
       try
       {
         BatchLiveEventRequestResult content = await Task.Run<BatchLiveEventRequestResult>((Func<Task<BatchLiveEventRequestResult>>)(async () => await liveEventController.ProcessLiveEvents(events1)));
@@ -151,7 +154,7 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.Web
         }
         catch (Exception ex)
         {
-          this.Logger.LogError((EventId)0, ex, Resources.FailedToProcessLiveEventRequest, (object)eventRequest.ContactId);
+          this.Logger.LogError((EventId)0, ex, "Failed to process live event request. Contact: '{0}'", (object)eventRequest.ContactId);
           processingResult = (ProcessingResult)new Failure();
         }
         LiveEventRequestResult eventRequestResult = new LiveEventRequestResult(eventRequest, processingResult.Success, processingResult.UpdatedEnrollments);
@@ -175,15 +178,15 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.Web
         {
           if (!contactLeaser.HasLease)
           {
-            this.Logger.LogInformation(string.Format((IFormatProvider)CultureInfo.CurrentCulture, Resources.FailedToTakeLeaseLogWorkItem, (object)eventRequest.ContactId), Array.Empty<object>());
+            this.Logger.LogInformation(string.Format((IFormatProvider)CultureInfo.CurrentCulture, "Failed to take lease for contact '{0}'. Logging live event to automation pool.", (object)eventRequest.ContactId), Array.Empty<object>());
             return await this.AddLiveEventToAutomationPool(eventRequest);
           }
           IProcessor processor = scope.ServiceProvider.GetRequiredService<IProcessorFactory>().CreateProcessor(eventRequest.ContactId, (ExecutionData)eventRequest.EventData);
           if (processor != null)
             return await Task.FromResult<ProcessingResult>(this.ProcessorRunner.Run(processor, eventRequest.Priority));
         }
-        this.Logger.LogError(Resources.FailedToCreateProcessorForLiveEventRequest, (object)eventRequest.ContactId);
-        return (ProcessingResult)new Failure(Resources.NoProcessorForLiveEventRequest);
+        this.Logger.LogError("Failed to create a processor for live event request. Contact: '{0}'", (object)eventRequest.ContactId);
+        return (ProcessingResult)new Failure("No processor for live event request.");
       }
     }
 
@@ -203,14 +206,25 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.Web
       foreach (KeyValuePair<Guid, WorkItemResult> result in (IEnumerable<KeyValuePair<Guid, WorkItemResult>>)workItemBatchResult.Results)
       {
         if (!result.Value.Success)
-          this.Logger.LogError(Resources.FailedToCreateWorkItem, new object[3]
+          this.Logger.LogError("Failed to create work item '{0}'. Status code: {1}. Message: {2}", new object[3]
           {
             (object) result.Key,
             (object) result.Value.StatusCode,
             (object) result.Value.SystemMessage
           });
       }
-      return (ProcessingResult)new Failure(string.Format((IFormatProvider)CultureInfo.CurrentCulture, Resources.FailedToProcessLiveEventRequest, (object)eventRequest.ContactId));
+      return (ProcessingResult)new Failure(string.Format((IFormatProvider)CultureInfo.CurrentCulture, "Failed to process live event request. Contact: '{0}'", (object)eventRequest.ContactId));
+    }
+
+    protected override void Initialize(HttpControllerContext controllerContext)
+    {
+      base.Initialize(controllerContext);
+
+      // Configure the serializer to serialize the requests and responses properly.
+      // Default serialization won't work as we have an array of an interface in the response.
+      // We also need the correct runtime model for the LiveEventDataJsonConverter.
+      Configuration.Formatters.JsonFormatter.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
+      Configuration.Formatters.JsonFormatter.SerializerSettings.Converters.Add(new LiveEventDataJsonConverter(_model));
     }
   }
 }
