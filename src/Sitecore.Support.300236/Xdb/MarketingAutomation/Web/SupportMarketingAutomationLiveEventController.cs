@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
@@ -224,7 +225,12 @@ namespace Sitecore.Support.Xdb.MarketingAutomation.Web
       // Default serialization won't work as we have an array of an interface in the response.
       // We also need the correct runtime model for the LiveEventDataJsonConverter.
       Configuration.Formatters.JsonFormatter.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
-      Configuration.Formatters.JsonFormatter.SerializerSettings.Converters.Add(new LiveEventDataJsonConverter(_model));
+      if (Configuration.Formatters.JsonFormatter.SerializerSettings.Converters.All(x =>
+        x.GetType() != typeof(LiveEventDataJsonConverter)))
+      {
+        Configuration.Formatters.JsonFormatter.SerializerSettings.Converters.Add(
+          new LiveEventDataJsonConverter(_model));
+      }
     }
   }
 }
